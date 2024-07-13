@@ -1,6 +1,4 @@
-import type { Config } from "bili";
-
-const config: Config = {
+const config = {
   plugins: {
     typescript2: {
       tsconfigOverride: {
@@ -19,14 +17,14 @@ const config: Config = {
         case "umd":
           return context.minify
             ? "ad-notations.community.min.js"
-            : "ad-notations.community.umd.js";
+            : "ad-notations.community.umd.js"
         case "esm":
-          return "ad-notations.community.esm.js";
+          return "ad-notations.community.esm.js"
         default:
-          return defaultFileName;
+          return defaultFileName
       }
     }
   }
-};
+}
 
-export default config;
+export default config
