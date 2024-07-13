@@ -1,29 +1,42 @@
-import Decimal from "break_infinity.js";
-import { Notation } from "./notation";
+import Decimal from "break_infinity.js"
+import { Notation } from "./notation"
 
-const HOURS = ["🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"];
-const LOG12 = Math.log10(12);
+const HOURS = [
+  "🕛",
+  "🕐",
+  "🕑",
+  "🕒",
+  "🕓",
+  "🕔",
+  "🕕",
+  "🕖",
+  "🕗",
+  "🕘",
+  "🕙",
+  "🕚"
+]
+const LOG12 = Math.log10(12)
 
 export class ClockNotation extends Notation {
-  public get name(): string {
-    return "Clock";
+  get name() {
+    return "Clock"
   }
 
-  public get infinite(): string {
-    return "🕛🕡";
+  get infinite() {
+    return "🕛🕡"
   }
 
-  public formatUnder1000(value: number): string {
-    return this.clockwise(new Decimal(value));
+  formatUnder1000(value) {
+    return this.clockwise(new Decimal(value))
   }
 
-  public formatDecimal(value: Decimal): string {
-    return this.clockwise(value);
+  formatDecimal(value) {
+    return this.clockwise(value)
   }
 
-  private clockwise(value: Decimal): string {
+  clockwise(value) {
     if (value.lt(12)) {
-      return this.hour(value.toNumber());
+      return this.hour(value.toNumber())
     }
     // Say the clock goes 0123456789ab. A single digit covers 0 through 11.
     // Two digits (clocks) go 00, 01, 02... 0b, 10, 11, ... bb
@@ -40,34 +53,43 @@ export class ClockNotation extends Notation {
     // 4 clocks, in general, is hyper scientific. However, when the fourth clock shows
     // up (showing 0), we do another cycle of scientific (so, mantissa + 2 exponent digits)
     // This gives another 144 possible values for the exponent, which gets to 300.
-    const log = value.log10() / LOG12;
-    let exponent = Math.floor(log);
+    const log = value.log10() / LOG12
+    let exponent = Math.floor(log)
     if (log < 301) {
-      const clockLow = (12 ** (log - exponent + 1) - 12) / 11;
+      const clockLow = (12 ** (log - exponent + 1) - 12) / 11
       if (exponent < 13) {
-        return this.hour(exponent - 1) + this.hour(clockLow);
+        return this.hour(exponent - 1) + this.hour(clockLow)
       }
-      exponent -= 13;
-      let prefix = "";
+      exponent -= 13
+      let prefix = ""
       if (exponent >= 144) {
-        prefix = this.hour(0);
-        exponent -= 144;
+        prefix = this.hour(0)
+        exponent -= 144
       }
-      return prefix + this.hour(exponent / 12) + this.hour(exponent % 12) + this.hour(clockLow);
+      return (
+        prefix +
+        this.hour(exponent / 12) +
+        this.hour(exponent % 12) +
+        this.hour(clockLow)
+      )
     }
     // With the first clock of 4 showing 1, we do 3 digits of exponent. So, 000 is 301, and bbb
     // is 2028. Past that, we go by 12's, and so on.
-    exponent -= 301;
-    let clockHigh = 1;
+    exponent -= 301
+    let clockHigh = 1
     while (exponent >= 1728) {
-      exponent = (exponent - 1728) / 12;
-      ++clockHigh;
+      exponent = (exponent - 1728) / 12
+      ++clockHigh
     }
-    return this.hour(clockHigh) + this.hour(exponent / 144) +
-      this.hour(exponent % 144 / 12) + this.hour(exponent % 12);
+    return (
+      this.hour(clockHigh) +
+      this.hour(exponent / 144) +
+      this.hour((exponent % 144) / 12) +
+      this.hour(exponent % 12)
+    )
   }
 
-  private hour(number: number): string {
-    return HOURS[Math.max(Math.min(Math.floor(number), 11), 0)];
+  hour(number) {
+    return HOURS[Math.max(Math.min(Math.floor(number), 11), 0)]
   }
 }
